@@ -2,7 +2,6 @@ package user
 
 import (
 	"context"
-	"fmt"
 
 	"gorm.io/gorm"
 )
@@ -62,7 +61,7 @@ func (r *postgresRepository) SendMoney(ctx context.Context, senderId uint, accou
 	}
 
 	if sender.Balance < amount {
-		return fmt.Errorf("insufficient balance")
+		return ErrInsufficientBalance
 	}
 
 	if err := r.db.WithContext(ctx).Where("account_id = ?", accountId).First(&receiver).Error; err != nil {

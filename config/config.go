@@ -1,8 +1,9 @@
 package config
 
 import (
-	"fmt"
 	"strings"
+
+	apperrors "myapp/internal/errors"
 
 	"github.com/spf13/viper"
 )
@@ -36,12 +37,12 @@ func LoadConfig(path string) (*Config, error) {
 
 	// Read the file
 	if err := viper.ReadInConfig(); err != nil {
-		return nil, fmt.Errorf("failed to read config file: %w", err)
+		return nil, apperrors.NewWithErr(apperrors.CodeConfigError, "failed to read config file", err)
 	}
 
 	var cfg Config
 	if err := viper.Unmarshal(&cfg); err != nil {
-		return nil, fmt.Errorf("unable to decode into struct: %w", err)
+		return nil, apperrors.NewWithErr(apperrors.CodeConfigError, "unable to decode into struct", err)
 	}
 
 	return &cfg, nil

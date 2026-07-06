@@ -2,8 +2,8 @@ package user
 
 import (
 	"context"
-	"fmt"
 	"myapp/config"
+	apperrors "myapp/internal/errors"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -15,6 +15,7 @@ type Service interface {
 	Register(ctx context.Context, req RegisterRequest) (*AuthResponse, error)
 	Login(ctx context.Context, req LoginRequest) (*AuthResponse, error)
 	GetProfile(ctx context.Context, UID uint) (*UserDTO, error)
+	GetFullProfile(ctx context.Context, UID uint) (*EUser, error)
 	LoadBalanceForUser(ctx context.Context, UID uint, newAmount float64) error
 	SendMoney(ctx context.Context, senderId uint, accountId int, amount float64) error
 }
@@ -44,7 +45,7 @@ func (u *EUser) CheckPassword(password string) bool {
 func GenerateJWT(userID uint) (string, error) {
 	cfg, err := config.LoadConfig(".")
 	if err != nil {
-		return "", fmt.Errorf("failed to load config: %w", err)
+		return "", apperrors.NewWithErr(apperrors.CodeConfigError, "failed to load config", err)
 	}
 	claims := &CustomClaims{
 		ID: userID,
@@ -99,7 +100,7 @@ func (s *userService) Login(ctx context.Context, req LoginRequest) (*AuthRespons
 	}
 
 	if !user.CheckPassword(req.Password) {
-		return nil, fmt.Errorf("invalid credentials")
+		return nil, ErrInvalidCredentials
 	}
 
 	token, err := GenerateJWT(user.ID)
@@ -119,6 +120,10 @@ func (s *userService) GetProfile(ctx context.Context, UID uint) (*UserDTO, error
 		return nil, err
 	}
 	return &user.UserDTO, nil
+}
+
+func (s *userService) GetFullProfile(ctx context.Context, UID uint) (*EUser, error) {
+	return s.repo.GetByID(ctx, UID)
 }
 
 func (s *userService) LoadBalanceForUser(ctx context.Context, UID uint, newAmount float64) error {
