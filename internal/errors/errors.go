@@ -1,5 +1,7 @@
 package errors
 
+import "github.com/labstack/echo/v5"
+
 type Code string
 
 const (
@@ -24,6 +26,21 @@ func (e *AppError) Error() string {
 
 func (e *AppError) Unwrap() error {
 	return e.Err
+}
+
+func (e *AppError) Response(c *echo.Context) error {
+	return c.JSON(HTTPStatus(e.Code), map[string]string{"error": e.Message})
+}
+
+func ErrorResponse(c *echo.Context, err error) error {
+	if appErr, ok := err.(*AppError); ok {
+		return c.JSON(HTTPStatus(appErr.Code), map[string]string{"error": appErr.Message})
+	}
+	return c.JSON(500, map[string]string{"error": err.Error()})
+}
+
+func SuccessResponse(c *echo.Context, message string) error {
+	return c.JSON(200, map[string]string{"message": message})
 }
 
 func New(code Code, message string) *AppError {
