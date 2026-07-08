@@ -20,6 +20,14 @@ type AppError struct {
 	Err     error
 }
 
+type ApiError struct {
+	Error string `json:"error" example:"error message"`
+}
+
+type ApiSuccess struct {
+	Message string `json:"message" example:"success message"`
+}
+
 func (e *AppError) Error() string {
 	return e.Message
 }

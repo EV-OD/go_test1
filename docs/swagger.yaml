@@ -1,5 +1,17 @@
 basePath: /api/v1
 definitions:
+  errors.ApiError:
+    properties:
+      error:
+        example: error message
+        type: string
+    type: object
+  errors.ApiSuccess:
+    properties:
+      message:
+        example: success message
+        type: string
+    type: object
   gorm.DeletedAt:
     properties:
       time:
@@ -11,6 +23,7 @@ definitions:
   user.AuthResponse:
     properties:
       token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
         type: string
       user:
         $ref: '#/definitions/user.EUser'
@@ -18,27 +31,36 @@ definitions:
   user.EUser:
     properties:
       account_id:
+        example: 1001
         type: integer
       balance:
+        example: 250.5
         type: number
       createdAt:
+        example: "2025-01-15T10:30:00Z"
         type: string
       deletedAt:
         $ref: '#/definitions/gorm.DeletedAt'
       email:
+        example: john@example.com
         type: string
       id:
+        example: 1
         type: integer
       name:
+        example: John Doe
         type: string
       role:
+        example: viewer
         type: string
       updatedAt:
+        example: "2025-06-01T14:20:00Z"
         type: string
     type: object
   user.LoadBalanceRequest:
     properties:
       amount:
+        example: 100
         type: number
     required:
     - amount
@@ -46,18 +68,39 @@ definitions:
   user.LoginRequest:
     properties:
       email:
+        example: john@example.com
         type: string
       password:
+        example: mypassword
         type: string
     required:
     - email
     - password
     type: object
+  user.RegisterRequest:
+    properties:
+      email:
+        example: john@example.com
+        type: string
+      name:
+        example: John Doe
+        type: string
+      password:
+        example: mypassword
+        minLength: 6
+        type: string
+    required:
+    - email
+    - name
+    - password
+    type: object
   user.SendMoneyRequest:
     properties:
       amount:
+        example: 50
         type: number
       receiver_account_id:
+        example: 1002
         type: integer
     required:
     - amount
@@ -66,16 +109,22 @@ definitions:
   user.UserDTO:
     properties:
       account_id:
+        example: 1001
         type: integer
       balance:
+        example: 250.5
         type: number
       email:
+        example: john@example.com
         type: string
       id:
+        example: 1
         type: integer
       name:
+        example: John Doe
         type: string
       role:
+        example: viewer
         type: string
     type: object
 info:
@@ -102,21 +151,15 @@ paths:
         "200":
           description: OK
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/errors.ApiSuccess'
         "400":
-          description: Invalid input data
+          description: Invalid request
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/errors.ApiError'
         "401":
           description: Unauthorized
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/errors.ApiError'
       security:
       - BearerAuth: []
       summary: Load balance for user
@@ -142,11 +185,9 @@ paths:
           schema:
             $ref: '#/definitions/user.AuthResponse'
         "400":
-          description: Invalid input data
+          description: Invalid request / Invalid email or password
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/errors.ApiError'
       summary: Login a user
       tags:
       - Auth
@@ -168,21 +209,15 @@ paths:
         "200":
           description: OK
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/errors.ApiSuccess'
         "400":
-          description: Invalid input data
+          description: Invalid request / insufficient balance
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/errors.ApiError'
         "401":
           description: Unauthorized
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/errors.ApiError'
       security:
       - BearerAuth: []
       summary: Send money to another account
@@ -201,9 +236,7 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/errors.ApiError'
       security:
       - BearerAuth: []
       summary: Get current user profile
@@ -220,7 +253,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/user.UserDTO'
+          $ref: '#/definitions/user.RegisterRequest'
       produces:
       - application/json
       responses:
@@ -229,12 +262,15 @@ paths:
           schema:
             $ref: '#/definitions/user.AuthResponse'
         "400":
-          description: Invalid input data
+          description: Invalid request / Invalid input data
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/errors.ApiError'
       summary: Register a new user
       tags:
       - Auth
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

@@ -34,9 +34,9 @@ type userHandler struct {
 // @Tags         Auth
 // @Accept       json
 // @Produce      json
-// @Param        request body      UserDTO true "User Registration Payload"
+// @Param        request body      RegisterRequest true "User Registration Payload"
 // @Success      201     {object}  AuthResponse
-// @Failure      400     {object}  map[string]string "Invalid input data"
+// @Failure      400     {object}  apperrors.ApiError "Invalid request / Invalid input data"
 // @Router       /register [post]
 func (h *userHandler) Register(c *echo.Context) error {
 	var req RegisterRequest
@@ -60,7 +60,7 @@ func (h *userHandler) Register(c *echo.Context) error {
 // @Produce      json
 // @Param        request body      LoginRequest true "User Login Payload"
 // @Success      200     {object}  AuthResponse
-// @Failure      400     {object}  map[string]string "Invalid input data"
+// @Failure      400     {object}  apperrors.ApiError "Invalid request / Invalid email or password"
 // @Router       /login [post]
 func (h *userHandler) Login(c *echo.Context) error {
 	var req LoginRequest
@@ -83,7 +83,7 @@ func (h *userHandler) Login(c *echo.Context) error {
 // @Security     BearerAuth
 // @Produce      json
 // @Success      200     {object}  UserDTO
-// @Failure      401     {object}  map[string]string "Unauthorized"
+// @Failure      401     {object}  apperrors.ApiError "Unauthorized"
 // @Router       /profile [get]
 func (h *userHandler) GetProfile(c *echo.Context) error {
 	uCtx := c.Get("currentUser")
@@ -129,9 +129,9 @@ func (h *userHandler) UserSuccessHandler(c *echo.Context) error {
 // @Accept       json
 // @Produce      json
 // @Param        request body      LoadBalanceRequest true "Load Balance Payload"
-// @Success      200     {object}  map[string]string
-// @Failure      400     {object}  map[string]string "Invalid input data"
-// @Failure      401     {object}  map[string]string "Unauthorized"
+// @Success      200     {object}  apperrors.ApiSuccess
+// @Failure      400     {object}  apperrors.ApiError "Invalid request"
+// @Failure      401     {object}  apperrors.ApiError "Unauthorized"
 // @Router       /balance/load [post]
 func (h *userHandler) PostLoadBalanceHandler(c *echo.Context) error {
 	uCtx := c.Get("currentUser")
@@ -159,9 +159,9 @@ func (h *userHandler) PostLoadBalanceHandler(c *echo.Context) error {
 // @Accept       json
 // @Produce      json
 // @Param        request body      SendMoneyRequest true "Send Money Payload"
-// @Success      200     {object}  map[string]string
-// @Failure      400     {object}  map[string]string "Invalid input data"
-// @Failure      401     {object}  map[string]string "Unauthorized"
+// @Success      200     {object}  apperrors.ApiSuccess
+// @Failure      400     {object}  apperrors.ApiError "Invalid request / insufficient balance"
+// @Failure      401     {object}  apperrors.ApiError "Unauthorized"
 // @Router       /money/send [post]
 func (h *userHandler) PostSendMoneyHandler(c *echo.Context) error {
 	uCtx := c.Get("currentUser")

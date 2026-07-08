@@ -15,6 +15,9 @@ import (
 // @version 1.0
 // @description This is a simple API server for user management and transactions.
 // @BasePath /api/v1
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 func NewRouter(cfg *config.Config) *echo.Echo {
 
 	db, err := config.ConnectDB(cfg.Database.URL)
