@@ -20,7 +20,7 @@ import (
 // @name Authorization
 func NewRouter(cfg *config.Config) *echo.Echo {
 
-	db, err := config.ConnectDB(cfg.Database.URL)
+	db, err := config.ConnectDB(cfg)
 	if err != nil {
 		panic(err)
 	}

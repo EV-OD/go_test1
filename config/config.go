@@ -19,7 +19,12 @@ type ServerConfig struct {
 }
 
 type DatabaseConfig struct {
-	URL string `mapstructure:"url"`
+	// URL      string `mapstructure:"url"`
+	USER     string `mapstructure: "user"`
+	PASSWORD string `mapstructure: "password"`
+	DB       string `mapstructure: "db"`
+	PORT     int    `mapstructure: "port"`
+	HOST     string `mapstructure: "host"`
 }
 
 type JWTConfig struct {
