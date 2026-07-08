@@ -32,5 +32,8 @@ func RegisterRoutes(grp *echo.Group, db *gorm.DB, cfg *config.Config) {
 
 	protectedAPI.GET("/me/", userHandler.GetProfile)
 	protectedAPI.POST("/loadbalance", userHandler.PostLoadBalanceHandler)
-	protectedAPI.POST("/send", userHandler.PostSendMoneyHandler)
+
+	roleBasedApi := protectedAPI.Group("")
+	roleBasedApi.Use(userHandler.EnsureRole("editor"))
+	roleBasedApi.POST("/send", userHandler.PostSendMoneyHandler)
 }

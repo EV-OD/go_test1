@@ -14,6 +14,7 @@ type UserDTO struct {
 	AccountID int     `json:"account_id" gorm:"unique;not null"`
 	Balance   float64 `json:"balance" gorm:"type:decimal(10,2);default:0.00"`
 	Password  string  `json:"-" gorm:"type:varchar(255);not null"`
+	Role      string  `json:"role" gorm:"type:varchar(20);check:role IN ('viewer', 'editor');default:'viewer';not null"`
 }
 
 type EUser struct {

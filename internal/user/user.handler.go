@@ -17,6 +17,7 @@ type Handler interface {
 	UserSuccessHandler(c *echo.Context) error
 	PostLoadBalanceHandler(c *echo.Context) error
 	PostSendMoneyHandler(c *echo.Context) error
+	EnsureRole(requiredRole string) echo.MiddlewareFunc
 }
 
 func NewUserHandler(s Service) Handler {
@@ -27,6 +28,16 @@ type userHandler struct {
 	service Service
 }
 
+// Register godoc
+// @Summary      Register a new user
+// @Description  Create a new user account profile in the system
+// @Tags         Auth
+// @Accept       json
+// @Produce      json
+// @Param        request body      UserDTO true "User Registration Payload"
+// @Success      201     {object}  AuthResponse
+// @Failure      400     {object}  map[string]string "Invalid input data"
+// @Router       /register [post]
 func (h *userHandler) Register(c *echo.Context) error {
 	var req RegisterRequest
 	if err := c.Bind(&req); err != nil {
@@ -125,4 +136,21 @@ func (h *userHandler) PostSendMoneyHandler(c *echo.Context) error {
 	}
 
 	return apperrors.SuccessResponse(c, "Money sent successfully")
+}
+
+func (h *userHandler) EnsureRole(requiredRole string) echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c *echo.Context) error {
+			user, ok := c.Get("currentUser").(*EUser)
+			if !ok || user == nil {
+				return ErrUserNotAuthorized.Response(c)
+			}
+
+			if user.Role != requiredRole {
+				return ErrInSufficientRole.Response(c)
+			}
+
+			return next(c)
+		}
+	}
 }
