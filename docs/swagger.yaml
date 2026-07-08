@@ -36,6 +36,33 @@ definitions:
       updatedAt:
         type: string
     type: object
+  user.LoadBalanceRequest:
+    properties:
+      amount:
+        type: number
+    required:
+    - amount
+    type: object
+  user.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  user.SendMoneyRequest:
+    properties:
+      amount:
+        type: number
+      receiver_account_id:
+        type: integer
+    required:
+    - amount
+    - receiver_account_id
+    type: object
   user.UserDTO:
     properties:
       account_id:
@@ -57,6 +84,131 @@ info:
   title: Simple Api
   version: "1.0"
 paths:
+  /balance/load:
+    post:
+      consumes:
+      - application/json
+      description: Add funds to authenticated user's balance
+      parameters:
+      - description: Load Balance Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/user.LoadBalanceRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid input data
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Load balance for user
+      tags:
+      - Users
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user and return JWT token
+      parameters:
+      - description: User Login Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/user.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.AuthResponse'
+        "400":
+          description: Invalid input data
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Login a user
+      tags:
+      - Auth
+  /money/send:
+    post:
+      consumes:
+      - application/json
+      description: Transfer funds from authenticated user to a receiver account
+      parameters:
+      - description: Send Money Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/user.SendMoneyRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid input data
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Send money to another account
+      tags:
+      - Users
+  /profile:
+    get:
+      description: Return profile for the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.UserDTO'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get current user profile
+      tags:
+      - Users
   /register:
     post:
       consumes:

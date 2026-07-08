@@ -52,6 +52,16 @@ func (h *userHandler) Register(c *echo.Context) error {
 	return c.JSON(201, authResponse)
 }
 
+// Login godoc
+// @Summary      Login a user
+// @Description  Authenticate user and return JWT token
+// @Tags         Auth
+// @Accept       json
+// @Produce      json
+// @Param        request body      LoginRequest true "User Login Payload"
+// @Success      200     {object}  AuthResponse
+// @Failure      400     {object}  map[string]string "Invalid input data"
+// @Router       /login [post]
 func (h *userHandler) Login(c *echo.Context) error {
 	var req LoginRequest
 	if err := c.Bind(&req); err != nil {
@@ -66,6 +76,15 @@ func (h *userHandler) Login(c *echo.Context) error {
 	return c.JSON(200, authResponse)
 }
 
+// GetProfile godoc
+// @Summary      Get current user profile
+// @Description  Return profile for the authenticated user
+// @Tags         Users
+// @Security     BearerAuth
+// @Produce      json
+// @Success      200     {object}  UserDTO
+// @Failure      401     {object}  map[string]string "Unauthorized"
+// @Router       /profile [get]
 func (h *userHandler) GetProfile(c *echo.Context) error {
 	uCtx := c.Get("currentUser")
 	if uCtx == nil {
@@ -102,6 +121,18 @@ func (h *userHandler) UserSuccessHandler(c *echo.Context) error {
 	return nil
 }
 
+// PostLoadBalanceHandler godoc
+// @Summary      Load balance for user
+// @Description  Add funds to authenticated user's balance
+// @Tags         Users
+// @Security     BearerAuth
+// @Accept       json
+// @Produce      json
+// @Param        request body      LoadBalanceRequest true "Load Balance Payload"
+// @Success      200     {object}  map[string]string
+// @Failure      400     {object}  map[string]string "Invalid input data"
+// @Failure      401     {object}  map[string]string "Unauthorized"
+// @Router       /balance/load [post]
 func (h *userHandler) PostLoadBalanceHandler(c *echo.Context) error {
 	uCtx := c.Get("currentUser")
 	if uCtx == nil {
@@ -120,6 +151,18 @@ func (h *userHandler) PostLoadBalanceHandler(c *echo.Context) error {
 	return apperrors.SuccessResponse(c, "Balance loaded successfully")
 }
 
+// PostSendMoneyHandler godoc
+// @Summary      Send money to another account
+// @Description  Transfer funds from authenticated user to a receiver account
+// @Tags         Users
+// @Security     BearerAuth
+// @Accept       json
+// @Produce      json
+// @Param        request body      SendMoneyRequest true "Send Money Payload"
+// @Success      200     {object}  map[string]string
+// @Failure      400     {object}  map[string]string "Invalid input data"
+// @Failure      401     {object}  map[string]string "Unauthorized"
+// @Router       /money/send [post]
 func (h *userHandler) PostSendMoneyHandler(c *echo.Context) error {
 	uCtx := c.Get("currentUser")
 	if uCtx == nil {
